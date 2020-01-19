@@ -1,23 +1,5 @@
-<!DOCTYPE html>
-<html>
-<head>
-<link rel="stylesheet" type="text/css" href="/static/privatemessages.css">
-<script type="text/javascript" src="http://yandex.st/jquery/1.8.3/jquery.min.js"></script>
-<script type="text/javascript" src="/static/jstz.min.js"></script>
-<script type="text/javascript" src="/static/privatemessages.js"></script>
-{% block head %}{% endblock %}
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-<title>{% block title %}Личные сообщения{% endblock title %}</title>
-</head>
-<body>
-{% block content %}{% endblock content %}
-</body>
-</html>
-
-
-chat.html
-
 {% extends "base.html" %}
+
 
 {% block title %}{{ partner.username }}{% endblock %}
 
@@ -42,7 +24,7 @@ $(document).ready(function() {
     </div>
     <div class="conversation">
         {% for message in thread_messages reversed %}
-        <div class="message"> 
+        <div class="message">
             {% if message.sender == user %}<p class="author we"><span class="datetime">{{ message.datetime|date:"d.m.Y H:i:s" }}</span> {{ user.username }}:</p>{% else %}<p class="author partner"><span class="datetime">{{ message.datetime|date:"d.m.Y H:i:s" }}</span> {{ partner.username }}:</p>{% endif %}
             <p class="message">{{ message.text|linebreaksbr }}</p>
         </div>
