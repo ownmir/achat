@@ -21,7 +21,7 @@ def send_message_view(request):
     if not request.method == "POST":
         return HttpResponse("Please use POST.")
 
-    if not request.user.is_authenticated():
+    if not request.user.is_authenticated:
         return HttpResponse("Please sign in.")
 
     message_text = request.POST.get("message")
@@ -104,7 +104,7 @@ def send_message_api_view(request, thread_id):
 
 
 def messages_view(request):
-    if not request.user.is_authenticated():
+    if not request.user.is_authenticated:
         return HttpResponse("Please sign in.")
 
     threads = Thread.objects.filter(
