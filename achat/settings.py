@@ -131,3 +131,4 @@ STATICFILES_DIRS = (
 API_KEY = '$0m3-U/\/1qu3-K3Y'
 
 SEND_MESSAGE_API_URL = 'http://127.0.0.1:8000/messages/send_message_api'
+os.environ["DJANGO_ALLOW_ASYNC_UNSAFE"] = "true"
