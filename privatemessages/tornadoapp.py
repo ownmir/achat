@@ -11,7 +11,9 @@ import tornado.ioloop
 import tornado.httpclient
 
 from django.conf import settings
-from django.utils.importlib import import_module
+# https://stackoverflow.com/questions/32761566/django-1-9-importerror-for-import-module
+# from django.utils.importlib import import_module
+from importlib import import_module
 
 session_engine = import_module(settings.SESSION_ENGINE)
 
@@ -19,8 +21,8 @@ from django.contrib.auth.models import User
 
 from privatemessages.models import Thread
 
-c = aredis.Client()
-c.connect()
+c = aredis.StrictRedis(host='127.0.0.1', port=6379, db=0)
+# c.connect()
 
 
 class MainHandler(tornado.web.RequestHandler):
@@ -32,8 +34,11 @@ class MainHandler(tornado.web.RequestHandler):
 class MessagesHandler(tornado.websocket.WebSocketHandler):
     def __init__(self, *args, **kwargs):
         super(MessagesHandler, self).__init__(*args, **kwargs)
-        self.client = brukva.Client()
-        self.client.connect()
+        self.client = aredis.StrictRedis(host='127.0.0.1', port=6379, db=0)
+        #self.client.connect()
+
+    def check_origin(self, origin):
+        return True
 
     def open(self, thread_id):
         session_key = self.get_cookie(settings.SESSION_COOKIE_NAME)

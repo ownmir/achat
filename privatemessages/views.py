@@ -62,7 +62,7 @@ def send_message_view(request):
     )
 
     return HttpResponseRedirect(
-        reverse('privatemessages.views.messages_view')
+        reverse('messages_view')
     )
 
 
@@ -127,7 +127,7 @@ def messages_view(request):
             "total_messages"
         )
 
-    return render('private_messages.html',
+    return render(request,  'private_messages.html',
                               {
                                   "threads": threads,
                               }
@@ -135,7 +135,7 @@ def messages_view(request):
 
 
 def chat_view(request, thread_id):
-    if not request.user.is_authenticated():
+    if not request.user.is_authenticated:
         return HttpResponse("Please sign in.")
 
     thread = get_object_or_404(
@@ -151,12 +151,12 @@ def chat_view(request, thread_id):
     r = redis.Redis()
 
     messages_total = r.hget(
-        "".join(["thread_", thread_id, "_messages"]),
+        "".join(["thread_", str(thread_id), "_messages"]),
         "total_messages"
     )
 
     messages_sent = r.hget(
-        "".join(["thread_", thread_id, "_messages"]),
+        "".join(["thread_", str(thread_id), "_messages"]),
         "".join(["from_", user_id])
     )
 
