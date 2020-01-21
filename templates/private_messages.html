@@ -1,42 +1,23 @@
 {% extends "base.html" %}
 
-{% block title %}{{ partner.username }}{% endblock %}
-
-{% block head %}
-<script type="text/javascript">
-$(document).ready(function() {
-    activate_chat({{ thread_id }}, "{{ user.username }}", {
-        "total": {{ messages_total }},
-        "sent": {{ messages_sent }},
-        "received": {{ messages_received }}
-    });
-});
-</script>
-{% endblock %}
 
 {% block content %}
 {% load pluralize %}
-<div class="chat">
-    <div class="partner">
-        <p class="name">{{ partner.username }}</p>
-        <p class="messages"><span class="total">{{ messages_total }}</span> {{ messages_total|rupluralize:"сообщение,сообщения,сообщений" }} (<span class="received">{{ messages_received }}</span> получено, <span class="sent">{{ messages_sent }}</span> отправлено)</p>
+<div class="private_messages">
+    <h1>Собеседники</h1>
+    <div class="partners">
+    {% for thread in threads %}
+        <p><a href="{% url 'chat_view' thread.id  %}">{{ thread.partner.username }} ({{ thread.total_messages|default_if_none:"0" }} {{ thread.total_messages|rupluralize:"сообщение,сообщения,сообщений" }})</a></p>
+    {% empty %}
+        <p>Пока что собеседников нет.</p>
+    {% endfor %}
     </div>
-    <div class="conversation">
-        {% for message in thread_messages reversed %}
-        <div class="message"> 
-            {% if message.sender == user %}<p class="author we"><span class="datetime">{{ message.datetime|date:"d.m.Y H:i:s" }}</span> {{ user.username }}:</p>{% else %}<p class="author partner"><span class="datetime">{{ message.datetime|date:"d.m.Y H:i:s" }}</span> {{ partner.username }}:</p>{% endif %}
-            <p class="message">{{ message.text|linebreaksbr }}</p>
-        </div>
-        {% endfor %}
-    </div>
-    <form class="message_form">
-        <div class="compose">
-            <textarea rows="1" cols="30" id="message_textarea"></textarea>
-        </div>
-        <div class="send">
-            <button class="btn" type="button">Отправить</button>
-            <p>Вы также можете отправлять сообщения с помощью клавиш Ctrl + Enter.</p>
-        </div>
+    <h1>Отправить сообщение</h1>
+    <form action="{% url 'send_message_view' %}" method="post" class="new_message">
+        {% csrf_token %}
+        <p class="name"><input name="recipient_name" placeholder="Имя получателя"></p>
+        <p><textarea name="message" placeholder="Сообщение"></textarea></p>
+        <p><input type="submit" value="Отправить"></p>
     </form>
 </div>
 {% endblock content %}
