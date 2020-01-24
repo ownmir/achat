@@ -56,9 +56,13 @@ class MessagesHandler(tornado.websocket.WebSocketHandler):
             self.close()
             return
         self.channel = "".join(['thread_', thread_id,'_messages'])
-        self.client.subscribe(self.channel)
+        self.pub_sub = self.client.pubsub()
+        # self.client.subscribe(self.channel)
+        self.pub_sub.subscribe(self.channel)
         self.thread_id = thread_id
-        self.client.listen(self.show_new_message)
+        # self.client.listen(self.show_new_message)
+        # self.pub_sub.listen(self.show_new_message)
+        self.pub_sub.listen()
 
     def handle_request(self, response):
         pass
@@ -82,7 +86,8 @@ class MessagesHandler(tornado.websocket.WebSocketHandler):
                         "/"
                     ]),
             method="POST",
-            body=urllib.urlencode({
+            #https://stackoverflow.com/questions/28906859/module-has-no-attribute-urlencode
+            body=urllib.parse.urlencode({
                 "message": message.encode("utf-8"),
                 "api_key": settings.API_KEY,
                 "sender_id": self.user_id,
@@ -99,13 +104,15 @@ class MessagesHandler(tornado.websocket.WebSocketHandler):
         except AttributeError:
             pass
         def check():
-            if self.client.connection.in_progress:
+            # if self.client.connection.in_progress:
+            if self.client.connection_pool.get_connection():
                 tornado.ioloop.IOLoop.instance().add_timeout(
                     datetime.timedelta(0.00001),
                     check
                 )
             else:
-                self.client.disconnect()
+                # self.client.disconnect()
+                self.client.connection_pool.get_connection().disconnect()
         tornado.ioloop.IOLoop.instance().add_timeout(
             datetime.timedelta(0.00001),
             check
